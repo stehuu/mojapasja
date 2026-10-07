@@ -1,4 +1,60 @@
-# Audyt i decyzja: budujemy stronę od nowa
+# Audyt i decyzja
+
+## AKTUALIZACJA 2026-10-07 – audyt obecnej strony (z archiwum ZIP)
+
+Właściciel przesłał archiwum `public_html` ze strony roboczej oraz zrzuty
+ekranu. **To zmienia rekomendację z sekcji 3 poniżej** – tamta powstała bez
+wglądu w obecną stronę.
+
+### Werdykt
+
+**Obecna strona wygląda wyraźnie lepiej niż szkielet w tym repozytorium**
+(prawdziwe wideo i zdjęcia, logo, dopracowana typografia, dobre teksty,
+konkretne sale: Lustrzana, La Perla, Balowa). Nie należy jej zastępować
+szkieletem z PR #1. Należy naprawić jej błędy techniczne.
+
+### Czym obecna strona jest naprawdę
+
+To **nie jest strona PHP/HTML pisana ręcznie**, tylko **wynik eksportu
+aplikacji Next.js** (katalog `_next/`, pliki `__next.*.txt`) plus jeden
+skrypt PHP do formularza (`api/zapytanie.php`). W archiwum **nie ma kodu
+źródłowego** – są tylko pliki wynikowe. Każda zmiana treści wymaga
+oryginalnego projektu Next.js i ponownego zbudowania. Kluczowe pytanie:
+**gdzie jest kod źródłowy i kto/co go wygenerowało?**
+
+### Błędy znalezione w plikach (sprawdzone)
+
+| # | Problem | Skutek | Waga |
+|---|---|---|---|
+| 1 | 40 plików ma w nazwie znak `\` (np. `images\9b2c...jpg`) – pliki wgrane z Windowsa, ścieżki zapisały się jako część nazwy. 23 z nich nie mają poprawnej kopii. | Serwer Linux nie znajdzie ich pod adresem `/images/...` | wysoka |
+| 2 | Brak 8 obrazów, do których odwołuje się HTML: 5 zdjęć z `images/` (tylko wersje z `\`) oraz cały katalog `room-photos/` (zdjęcia sal Balowa, La Perla, Lustrzana) | Puste/zepsute zdjęcia w sekcji „Sale”, na stronie „Sale”, „O nas” i w galerii | wysoka |
+| 3 | Wszystkie 7 podstron ma **identyczny** `<title>` i `description` | Google nie odróżnia podstron, słabsze SEO | średnia |
+| 4 | Brak `canonical`, brak `noindex` na domenie roboczej, brak danych strukturalnych (schema.org), brak `sitemap.xml` i `robots.txt` | Ryzyko zaindeksowania domeny `hostingersite.com`, słabsze SEO lokalne | średnia |
+| 5 | W katalogu publicznym leżą 2 archiwa ZIP (`mojapasja-hostinger*.zip`, po ~7 MB) i stary build w `_next` | Każdy może je pobrać; bałagan na serwerze | średnia |
+| 6 | Brak menu restauracji i godzin otwarcia – strona jest wyłącznie stroną sali weselnej | Do decyzji biznesowej: czy restauracja przyjmuje gości à la carte? | do decyzji |
+| 7 | Brak wzmianki o nagrodach „Mistrzowie Smaku 2023/2025” (jeśli prawdziwe) | Niewykorzystany atut | niska |
+| 8 | ~720 KB JavaScriptu dla strony wizytówkowej | Wolniejsze ładowanie na telefonach | niska |
+
+Formularz (`api/zapytanie.php`) jest napisany przyzwoicie: honeypot,
+walidacja, blokada wstrzyknięcia nagłówków, zapis kopii do CSV w katalogu
+zablokowanym przez `.htaccess`. Do poprawy drobiazgi: brak tokenu CSRF,
+limit wysyłek tylko na sesję.
+
+### Nowa rekomendacja
+
+1. **Naprawić obecną stronę, nie budować od nowa.**
+2. Natychmiast (bez kodu źródłowego, w Menedżerze plików): usunąć oba ZIP-y
+   z `public_html`, wgrać brakujące zdjęcia pod poprawnymi ścieżkami
+   (`images/…`, `room-photos/…`), usunąć pliki z `\` w nazwie.
+3. Ustalić, gdzie jest kod źródłowy Next.js. Jeśli jest – poprawki SEO
+   (punkty 3–4) robimy w nim. Jeśli go nie ma – przenosimy ten wygląd
+   i treść do prostej struktury PHP z tego repozytorium (szkielet
+   z PR #1 ma już SEO, noindex, schema.org i formularz), używając
+   zdjęć i tekstów z obecnej strony.
+
+---
+
+## Pierwotny audyt (bez dostępu do strony)
 
 Data: 2026-10-07
 
