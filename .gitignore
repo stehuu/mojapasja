@@ -1,5 +1,7 @@
 .DS_Store
 *.log
-/vendor/
 .idea/
 .vscode/
+__pycache__/
+# Zapytania klientów (dane osobowe) – nigdy do repozytorium
+public_html/private_inquiries/*.csv

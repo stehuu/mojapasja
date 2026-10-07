@@ -1,0 +1,9 @@
+:HL["/_next/static/chunks/0miec.68.1g-h.css","style"]
+:HL["/images/da4fde5797367d88b001a90a7b40b2fa.jpg","image"]
+:HL["/images/9b2c560ca7cdeb51514ad5bf048e5233.jpg","image"]
+:HL["/images/fdb7120d1098faa9063da58a5366e519.jpg","image"]
+:HL["/images/8a43f0e4193d5bce8a98771e57f8be61.jpg","image"]
+:HL["/images/d069083adbd844bd874a570b2f90c39c.jpg","image"]
+:HL["/images/e21d862d775a8baaffbb449fb036e01a.jpg","image"]
+:HL["/logo-moja-pasja.png","image"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"galeria","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"Nwq52oLb0VeJeF8fCNFWB"}

@@ -42,15 +42,52 @@ limit wysyłek tylko na sesję.
 
 ### Nowa rekomendacja
 
-1. **Naprawić obecną stronę, nie budować od nowa.**
-2. Natychmiast (bez kodu źródłowego, w Menedżerze plików): usunąć oba ZIP-y
-   z `public_html`, wgrać brakujące zdjęcia pod poprawnymi ścieżkami
-   (`images/…`, `room-photos/…`), usunąć pliki z `\` w nazwie.
-3. Ustalić, gdzie jest kod źródłowy Next.js. Jeśli jest – poprawki SEO
-   (punkty 3–4) robimy w nim. Jeśli go nie ma – przenosimy ten wygląd
-   i treść do prostej struktury PHP z tego repozytorium (szkielet
-   z PR #1 ma już SEO, noindex, schema.org i formularz), używając
-   zdjęć i tekstów z obecnej strony.
+Naprawić obecną stronę, nie budować od nowa. Wykonane – patrz niżej.
+
+## STAN PO NAPRAWIE (2026-10-07)
+
+`public_html/` w repozytorium zawiera naprawioną obecną stronę, wygenerowaną
+skryptem `tools/napraw_eksport.py` z archiwum `public_html_2.zip`.
+Szkielet PHP z pierwszego commita został usunięty (jest w historii gita).
+
+### Naprawione
+
+| # | Problem | Co zrobiono | Weryfikacja |
+|---|---|---|---|
+| 1 | Pliki z `\` w nazwie | Ścieżki znormalizowane; 6 zdjęć galerii i strony głównej odzyskanych | Test w przeglądarce: 0 brakujących plików z `images/` (przed: 6) |
+| 2 | Brak zdjęć sal (`room-photos/`, 12 plików) | Plansza „Zdjęcia sali wkrótce” przez regułę w `.htaccess`, znika po wgraniu zdjęć | 0 zepsutych obrazków na 10 podstronach (przed: do 8 na podstronę) |
+| 3 | Identyczne tytuły/opisy | Każda z 10 podstron ma własny tytuł i opis, także przy nawigacji bez przeładowania | Test: tytuł zmienia się po kliknięciu w menu |
+| 4 | Brak canonical, OG, schema.org, sitemap, robots | Dodane; noindex + `robots.txt` blokujący na `*.hostingersite.com` | `robots.txt` lokalnie; nagłówek do sprawdzenia na serwerze |
+| 5 | ZIP-y i stare buildy w katalogu publicznym | Usunięte 2 archiwa, 6 starych buildów, 51 zbędnych plików; 27 MB → 6 MB | Brak błędów JS po usunięciu |
+| – | Logo 800 KB (1536×1024) wyświetlane w 180×120 | Zmniejszone do 540×360, 113 KB | wizualnie bez zmian |
+| – | Strona 404 po angielsku | Tekst i tytuł po polsku, `noindex` | zrzut ekranu |
+| – | Brak ochrony `api/config.php`, listowania katalogów, archiwów | `.htaccess`: blokada, HTTPS, nagłówki bezpieczeństwa, cache | 403 lokalnie |
+
+Formularz przetestowany lokalnie: zapis do CSV działa, ochrona przed
+formułami Excela działa; wysyłka maila do sprawdzenia na serwerze.
+
+### Nie dało się naprawić bez kodu źródłowego Next.js
+
+- **Zdjęcia sal** – musi je dostarczyć restauracja (lista nazw w README).
+- **Strona 404** – jest po polsku, ale to surowy szablon bez menu i stylu.
+- **Nagrody „Mistrzowie Smaku”** – w `docs/materialy/mistrzowie-smaku-wyniki.jpg`
+  jest zrzut: 1. miejsca w kategoriach Kucharz Roku (Grzegorz Saba) i Menedżer
+  Gastronomii Roku (Klaudia Kupicha). Na stronie o tym ani słowa. Rok do potwierdzenia.
+- **Informacja o dofinansowaniu z UE** – w starych plikach była plansza projektu
+  „Innowacyjne wsparcie młodych par, kluczem do weselnego sukcesu” (RPO WSL
+  2014–2020, EFRR), `docs/materialy/dofinansowanie-ue-plansza.jpg`. Umowy
+  o dofinansowanie zwykle wymagają informowania o nim na stronie przez okres
+  trwałości projektu. **Sprawdzić w umowie**, czy obowiązek nadal trwa – jeśli
+  tak, planszę trzeba przywrócić na stronie.
+- **Menu restauracji i godziny otwarcia** – brak; decyzja biznesowa.
+- **Polityka prywatności** – brak na stronie, a formularz zbiera dane osobowe
+  i zapisuje adres IP. Przy zgodzie w formularzu powinien być link do polityki.
+
+### Kolejny krok
+
+Zdobyć kod źródłowy Next.js (kto robił stronę / w jakim narzędziu) i dodać
+go do repozytorium. Wtedy: metadane SEO w kodzie zamiast w skrypcie,
+polityka prywatności, nagrody, ewentualnie plansza UE, ładna strona 404.
 
 ---
 

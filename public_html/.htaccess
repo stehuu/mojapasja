@@ -1,64 +1,66 @@
-# Restauracja Moja Pasja – konfiguracja Apache/LiteSpeed (Hostinger)
+# Restauracja Moja Pasja – Hostinger (Apache/LiteSpeed)
+# Wygenerowane przez tools/napraw_eksport.py
 
+DirectoryIndex index.html index.php
 Options -Indexes
-DirectoryIndex index.php
-ErrorDocument 404 /404.php
+ErrorDocument 404 /404.html
 AddDefaultCharset UTF-8
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Wymuszenie HTTPS
+    # HTTPS
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Bez "www" (zmień, jeśli docelowo ma być z www)
+    # Bez www
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
     RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
 
-    # Brak dostępu z zewnątrz do kodu aplikacji i plików ukrytych
-    RewriteRule ^app(/|$) - [F,L]
-    RewriteRule (^|/)\. - [F,L]
+    # Domena robocza Hostingera: zakaz indeksowania
+    RewriteCond %{HTTP_HOST} \.hostingersite\.com$ [NC]
+    RewriteRule ^robots\.txt$ robots-staging.txt [L]
+    RewriteCond %{HTTP_HOST} \.hostingersite\.com$ [NC]
+    RewriteRule ^ - [E=MP_STAGING:1]
 
-    # robots.txt i sitemap.xml generowane przez PHP
-    RewriteRule ^robots\.txt$ robots.php [L]
-    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    # Pliki ukryte (poza .well-known) i konfiguracja niedostępne z przeglądarki
+    RewriteRule (^|/)\.(?!well-known/) - [F]
+    RewriteRule ^api/config\.php$ - [F]
 
-    # Stare adresy z końcówką .php → ładne adresy (301)
-    RewriteCond %{THE_REQUEST} \s/+([^\s?]+?)\.php[\s?] [NC]
-    RewriteCond %1 !^(robots|sitemap)$
-    RewriteRule ^ /%1 [R=301,L,NE]
-    RewriteCond %{THE_REQUEST} \s/+index[\s?] [NC]
-    RewriteRule ^ / [R=301,L]
+    # Stary adres
+    RewriteRule ^index\.php/?$ index.html [L]
 
-    # Ładne adresy: /menu → menu.php
+    # Brakujące zdjęcia sal → plansza "Zdjęcia sali wkrótce".
+    # Wgranie prawdziwego pliku do room-photos/ automatycznie ją zastępuje.
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{DOCUMENT_ROOT}/$1.php -f
-    RewriteRule ^([a-z0-9-]+)/?$ $1.php [L]
-
-    # Przekierowania ze STAREJ strony – uzupełnić po spisaniu jej adresów, np.:
-    # RewriteRule ^oferta-weselna/?$ /przyjecia [R=301,L]
+    RewriteRule ^room-photos/[^/]+\.(jpe?g|png|webp)$ images/zdjecie-wkrotce.jpg [L]
 </IfModule>
 
+<FilesMatch "\.(zip|csv|md|log|bak|sql|py)$">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow" env=MP_STAGING
+    Header always set X-Robots-Tag "noindex, nofollow" env=REDIRECT_MP_STAGING
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
-    Header always set Strict-Transport-Security "max-age=31536000"
-    Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-src https://maps.google.com https://www.google.com; form-action 'self'; base-uri 'self'; frame-ancestors 'self'"
 
-    <FilesMatch "\.(css|js|svg|jpg|jpeg|png|webp|avif|woff2)$">
+    # JS i CSS występują tylko w /_next/static/ i mają hash w nazwie – cache na rok
+    <FilesMatch "\.(js|css)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(jpe?g|png|webp|avif|svg|mp4|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    <FilesMatch "\.(html|txt)$">
+        Header set Cache-Control "no-cache"
     </FilesMatch>
 </IfModule>
 
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/xml text/plain application/ld+json
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript text/javascript image/svg+xml application/xml application/json
 </IfModule>
-
-<FilesMatch "\.(md|log|ini|sh|sql|lock|json)$">
-    Require all denied
-</FilesMatch>

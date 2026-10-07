@@ -1,0 +1,3 @@
+# Domena robocza – nie indeksować
+User-agent: *
+Disallow: /

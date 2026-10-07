@@ -1,94 +1,110 @@
 # Restauracja Moja Pasja – strona internetowa
 
 Strona restauracji Moja Pasja (Sosnowiec, ul. Podjazdowa 21).
-Czysty PHP 8 + HTML + CSS, bez frameworków i bazy danych – pod hosting Hostinger.
 
-Audyt, decyzje techniczne i lista rzeczy do zrobienia: [`docs/AUDYT.md`](docs/AUDYT.md).
+`public_html/` to **naprawiona wersja obecnej strony** z serwera Hostinger
+(eksport aplikacji Next.js 16 + skrypt PHP formularza). Kodu źródłowego
+Next.js w repozytorium nie ma – patrz [`docs/AUDYT.md`](docs/AUDYT.md).
 
 ## Struktura
 
 ```
-public_html/                ← zawartość tego katalogu wgrywamy do public_html na Hostingerze
-├── index.php               strona główna
-├── menu.php                karta dań
-├── przyjecia.php           wesela i przyjęcia
-├── galeria.php             galeria (czyta zdjęcia z assets/img/galeria/)
-├── kontakt.php             kontakt, dojazd, formularz
-├── polityka-prywatnosci.php
-├── 404.php
-├── robots.php, sitemap.php generują /robots.txt i /sitemap.xml
-├── .htaccess               HTTPS, ładne adresy, bezpieczeństwo, cache
-├── app/                    (zablokowany dla przeglądarki)
-│   ├── config.php          ← DANE FIRMY: telefony, e-mail, godziny, social media
-│   ├── data/menu.php       ← MENU
-│   ├── data/przyjecia.php  ← oferta przyjęć i usługi dodatkowe
-│   ├── bootstrap.php       wspólne funkcje
-│   ├── contact-form.php    obsługa formularza
-│   └── templates/          nagłówek, stopka, godziny, dane strukturalne
-└── assets/
-    ├── css/style.css
-    ├── js/main.js
-    └── img/                ← ZDJĘCIA
+public_html/                gotowa strona – zawartość wgrywamy do public_html na Hostingerze
+├── index.html, o-nas/, sale/, oferta/, galeria/, kontakt/, zapytaj-o-oferte/
+├── _next/                  skrypty i style strony (nie edytować ręcznie)
+├── images/                 zdjęcia i wideo
+├── room-photos/            ← BRAK – tu trzeba wgrać zdjęcia sal (lista niżej)
+├── api/zapytanie.php       obsługa formularza „Zapytaj o ofertę”
+├── api/config.php          adres e-mail, na który trafiają zapytania
+├── private_inquiries/      kopia zapytań w CSV (zablokowany dla przeglądarki)
+├── .htaccess               HTTPS, noindex na domenie roboczej, bezpieczeństwo, cache
+├── robots.txt, robots-staging.txt, sitemap.xml
+tools/
+├── napraw_eksport.py       skrypt, który z ZIP-a z serwera robi public_html/
+└── podglad.php             lokalny podgląd strony
+docs/
+├── AUDYT.md                audyt, znalezione błędy, decyzje, lista zadań
+└── materialy/              zrzut wyników „Mistrzowie Smaku”, plansza o dofinansowaniu UE
 ```
 
-## Jak zmienić treść
+## Brakujące zdjęcia sal – do wgrania
 
-- **Telefon, e-mail, godziny otwarcia, linki do social media** → `public_html/app/config.php`
-- **Menu** → `public_html/app/data/menu.php` (pusta kategoria się nie wyświetla;
-  dopóki menu jest puste, strona pokazuje komunikat „Aktualizujemy kartę”)
-- **Oferta przyjęć** → `public_html/app/data/przyjecia.php`
+Strona wyświetla te pliki, ale nie było ich na serwerze. Do czasu wgrania
+pokazuje się plansza „Zdjęcia sali wkrótce”. Wgraj pliki JPG **dokładnie
+pod tymi nazwami** do katalogu `public_html/room-photos/` – plansza zniknie sama.
 
-## Zdjęcia
+| Plik | Gdzie się wyświetla |
+|---|---|
+| `lustrzana-1.jpg` | strona główna, „Sale”, podstrona Sali Lustrzanej |
+| `lustrzana-2.jpg`, `lustrzana-4.jpg` | galeria Sali Lustrzanej i podstrona La Perli (jako zdjęcia poglądowe) |
+| `lustrzana-3.jpg`, `lustrzana-5.jpg` … `lustrzana-7.jpg` | galeria Sali Lustrzanej |
+| `balowa-1.jpg` | strona główna, „Sale”, podstrona Sali Balowej |
+| `balowa-2.jpg` | strona główna i „Sale” **jako zdjęcie La Perli**, podstrona La Perli, galeria Balowej |
+| `balowa-4.jpg`, `balowa-6.jpg`, `balowa-7.jpg` | galeria Sali Balowej |
 
-Wgraj pliki pod dokładnie tymi nazwami – pojawią się automatycznie
-(zanim ich nie ma, strona pokazuje eleganckie zastępniki):
+Uwaga: La Perla nie ma własnych zdjęć – strona celowo pokazuje zdjęcia
+poglądowe z innych sal (z dopiskiem „Galerię La Perla uzupełnimy wkrótce”).
+Po zrobieniu zdjęć La Perli trzeba to zmienić w kodzie źródłowym.
 
-| Plik | Gdzie | Sugerowany rozmiar |
-|---|---|---|
-| `assets/img/hero.jpg` | duże zdjęcie na górze strony głównej | 2000×1200 |
-| `assets/img/o-nas.jpg` | sekcja „O nas” | 1200×900 |
-| `assets/img/przyjecia/wesela.jpg` | | 1200×900 |
-| `assets/img/przyjecia/komunie.jpg` | | 1200×900 |
-| `assets/img/przyjecia/urodziny.jpg` | | 1200×900 |
-| `assets/img/przyjecia/firmowe.jpg` | | 1200×900 |
-| `assets/img/og-image.jpg` | podgląd przy udostępnianiu na Facebooku | 1200×630 |
-| `assets/img/galeria/*.jpg` | galeria – dowolna liczba; nazwa pliku = opis, np. `sala-glowna.jpg` | 1600 px szer. |
-
-Przed wgraniem zmniejsz zdjęcia (np. [squoosh.app](https://squoosh.app), jakość ~80%) –
-plik powinien ważyć do ~300 KB.
+Zdjęcia zmniejsz przed wgraniem do ok. 1600 px szerokości (np. [squoosh.app](https://squoosh.app), jakość ~80%).
 
 ## Wdrożenie na Hostinger
 
-1. hPanel → **Pliki → Menedżer plików** → katalog `public_html` domeny.
-2. Zrób kopię zapasową obecnej zawartości (pobierz jako ZIP).
-3. Wgraj **zawartość** katalogu `public_html/` z repozytorium (razem z ukrytym
-   plikiem `.htaccess` i katalogiem `app/`).
-4. hPanel → **Zaawansowane → Konfiguracja PHP** → wersja PHP **8.1 lub nowsza**.
-5. hPanel → **E-maile** → utwórz skrzynkę ustawioną w `form_sender`
-   (domyślnie `formularz@mojapasja.sosnowiec.pl`) i wyślij testowe zapytanie.
+1. hPanel → **Pliki → Menedżer plików** → `public_html` domeny.
+2. **Zrób kopię zapasową** (zaznacz wszystko → Kompresuj → pobierz ZIP).
+3. **Pobierz `private_inquiries/zapytania.csv`, jeśli istnieje** – to zapytania klientów.
+4. Usuń starą zawartość `public_html` **oprócz katalogu `private_inquiries/`**.
+5. Wgraj zawartość katalogu `public_html/` z repozytorium.
+   - Najprościej: spakuj go na komputerze do ZIP-a, wgraj ZIP i użyj „Rozpakuj”
+     w Menedżerze plików, a potem **usuń ZIP z serwera**.
+   - Uwaga na Windows: wbudowane „Wyślij do → folder skompresowany” w starszych
+     wersjach zapisuje ścieżki ze znakiem `\`. To właśnie zepsuło obecną stronę.
+     Użyj 7-Zip albo sprawdź po rozpakowaniu, że w `images/` są normalne pliki,
+     a nie pliki o nazwach `images\…`.
+6. Sprawdź, czy na serwerze jest ukryty plik `.htaccess` (w Menedżerze plików
+   włącz „Pokaż ukryte pliki”).
+7. Wyślij testowe zapytanie z formularza i sprawdź skrzynkę `biuro@`.
 
-Alternatywa: hPanel → **Zaawansowane → Git** – podpięcie tego repozytorium
-z automatycznym wdrażaniem. Uwaga: Hostinger wdraża całe repozytorium do wskazanego
-katalogu, więc strona wyląduje w `public_html/public_html/` – wtedy trzeba albo
-wskazać katalog docelowy domeny na podkatalog, albo zmienić strukturę repo.
-
-### Przełączenie na domenę docelową
-
-W `public_html/app/config.php`:
-
-```php
-'base_url'  => 'https://mojapasja.sosnowiec.pl',
-'indexable' => true,
-```
-
-Następnie zgłoś `https://mojapasja.sosnowiec.pl/sitemap.xml` w Google Search Console.
-
-## Uruchomienie lokalne
+### Kontrola po wdrożeniu
 
 ```bash
-php -S localhost:8000 -t public_html dev/router.php
+curl -I https://darkorange-badger-503455.hostingersite.com/          # powinno być: X-Robots-Tag: noindex
+curl    https://darkorange-badger-503455.hostingersite.com/robots.txt # powinno być: Disallow: /
+curl -I https://darkorange-badger-503455.hostingersite.com/images/9b2c560ca7cdeb51514ad5bf048e5233.jpg  # 200
 ```
 
-`dev/router.php` naśladuje reguły z `.htaccess` (wbudowany serwer PHP ich nie czyta).
-Formularz lokalnie zwróci komunikat o błędzie wysyłki – to normalne, bo na komputerze
-nie ma serwera pocztowego.
+Jeśli nagłówka `X-Robots-Tag` nie ma (LiteSpeed może inaczej obsługiwać
+warunkowe nagłówki), domenę roboczą i tak chroni `robots.txt`.
+
+### Przejście na domenę docelową
+
+Canonicale, mapa strony i dane strukturalne wskazują już na
+`https://mojapasja.sosnowiec.pl`. Po podpięciu tej domeny w Hostingerze
+blokada indeksowania wyłącza się sama (działa tylko na `*.hostingersite.com`).
+Potem zgłoś `https://mojapasja.sosnowiec.pl/sitemap.xml` w Google Search Console.
+
+Jeśli docelowa domena ma być inna – zmień `DOMAIN` w `tools/napraw_eksport.py`
+i uruchom skrypt ponownie.
+
+## Gdy pojawi się nowy eksport strony
+
+Po każdej zmianie w projekcie Next.js:
+
+```bash
+python3 -I tools/napraw_eksport.py nowy_eksport.zip public_html
+```
+
+Skrypt sam poprawi nazwy plików, usunie stare buildy, ustawi tytuły
+podstron, wygeneruje `.htaccess`, `robots.txt` i `sitemap.xml`.
+Wymaga Pythona 3 i biblioteki Pillow (`pip install pillow`).
+
+Docelowo lepiej mieć kod źródłowy Next.js w tym repozytorium i poprawki
+SEO wpisać bezpośrednio w nim (metadata w plikach `page.tsx`).
+
+## Podgląd lokalny
+
+```bash
+php -S localhost:8000 -t public_html tools/podglad.php
+```
+
+Formularz lokalnie zapisze zapytanie do CSV, ale nie wyśle maila (brak serwera pocztowego).

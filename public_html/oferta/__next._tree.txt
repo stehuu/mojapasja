@@ -1,0 +1,4 @@
+:HL["/_next/static/chunks/0miec.68.1g-h.css","style"]
+:HL["/images/d069083adbd844bd874a570b2f90c39c.jpg","image"]
+:HL["/logo-moja-pasja.png","image"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"oferta","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"Nwq52oLb0VeJeF8fCNFWB"}
